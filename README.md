@@ -21,6 +21,7 @@
 - Add key shortcuts 
 - Funny username generator
 - Logging feature to log every event 
+- Send files from cli
 
 
 
