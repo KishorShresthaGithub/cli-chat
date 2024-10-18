@@ -4,11 +4,23 @@
 ## Features
 
 - Enter room code
+    - Save user session
+    - Revisit the room
+    - Review the chatlogs
+
 - List availabe users
+    - view room details
+
 - Send message in realtime
+    - send message in realtime with real time updates
+
 - Display old messages
+    - message log
+
 - Enable multiline messages
 - Add key shortcuts 
+- Funny username generator
+- Logging feature to log every event 
 
 
 
@@ -24,6 +36,10 @@
 - Streams
 - Buffers
 - Event Driven Programming
+
+
+
+
 
 
 
