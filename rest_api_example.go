@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	userUseCase "kslabs/chat-app-cli/user"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,7 +27,26 @@ func RestApiExample() {
 	router.HandleFunc("/items/{id}", updateItem).Methods("PUT")
 	router.HandleFunc("/items/{id}", deleteItem).Methods("DELETE")
 
+	router.HandleFunc("/users", handleCreateUser).Methods("POST")
+
 	log.Fatal(http.ListenAndServe(":8080", router))
+
+}
+
+func handleCreateUser(w http.ResponseWriter, r *http.Request) {
+
+	var createUserEntity userUseCase.CreateUserEntity
+	var createUserInterface userUseCase.CreateUserInterface
+
+	err := json.NewDecoder(r.Body).Decode(&createUserEntity)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	createUserInterface = &userUseCase.CreateUser{}
+	createUserInterface.Controller(&createUserEntity, w)
 
 }
 

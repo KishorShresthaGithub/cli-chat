@@ -3,7 +3,7 @@
 
 ## Features
 
-- Enter room code
+- Create or Enter room code
     - Save user session
     - Revisit the room
     - Review the chatlogs
