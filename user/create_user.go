@@ -31,9 +31,7 @@ func (user *CreateUser) SetWriter(write io.Writer)  {
 }
 
 func (user *CreateUser) Presentation(u *CreateUserEntity)  {
-
   fmt.Println(u)
-
   json.NewEncoder(*user.writer).Encode(&u)
 }
 

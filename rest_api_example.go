@@ -28,6 +28,7 @@ func RestApiExample() {
 	router.HandleFunc("/items/{id}", deleteItem).Methods("DELETE")
 
 	router.HandleFunc("/users", handleCreateUser).Methods("POST")
+	router.HandleFunc("/users/{id}", handleUpdateUser).Methods("PUT")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
@@ -47,6 +48,31 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	createUserInterface = &userUseCase.CreateUser{}
 	createUserInterface.Controller(&createUserEntity, w)
+
+}
+
+func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id,err := strconv.Atoi(params["id"]) 
+
+  if err !=nil {
+    log.Fatal(err)
+  }
+
+	var updateUserEntity userUseCase.UpdateUserEntity
+	var updateUserInterface userUseCase.UpdateUserInterface
+
+	err = json.NewDecoder(r.Body).Decode(&updateUserEntity)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updateUserInterface = &userUseCase.UpdateUser{}
+	updateUserInterface.Controller(&updateUserEntity, w, id)
 
 }
 
