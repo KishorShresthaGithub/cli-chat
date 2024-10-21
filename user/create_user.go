@@ -1,13 +1,13 @@
 package user
 
 import (
-  "io"
 	"database/sql"
-  "encoding/json"
+	"encoding/json"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"io"
 	shared "kslabs/chat-app-cli/shared"
 	"log"
-  "fmt"
 )
 
 type CreateUserEntity struct {
@@ -21,24 +21,23 @@ type CreateUserInterface interface {
 }
 
 type CreateUser struct {
-	db *sql.DB
-  writer *io.Writer
+	db     *sql.DB
+	writer *io.Writer
 }
 
-
-func (user *CreateUser) SetWriter(write io.Writer)  {
-  user.writer = &write
+func (user *CreateUser) SetWriter(write io.Writer) {
+	user.writer = &write
 }
 
-func (user *CreateUser) Presentation(u *CreateUserEntity)  {
-  fmt.Println(u)
-  json.NewEncoder(*user.writer).Encode(&u)
+func (user *CreateUser) Presentation(u *CreateUserEntity) {
+	fmt.Println(u)
+	json.NewEncoder(*user.writer).Encode(&u)
 }
 
-func (user *CreateUser) Controller(u *CreateUserEntity, w io.Writer)  {
+func (user *CreateUser) Controller(u *CreateUserEntity, w io.Writer) {
 	user.SetWriter(w)
-  user.DataAccess(u)
-  user.Presentation(u)
+	user.DataAccess(u)
+	user.Presentation(u)
 }
 
 func (user *CreateUser) DataAccess(u *CreateUserEntity) {
@@ -67,6 +66,6 @@ func (user *CreateUser) DataAccess(u *CreateUserEntity) {
 		log.Fatal(err)
 	}
 
-  user.db.Close()
+	user.db.Close()
 
 }

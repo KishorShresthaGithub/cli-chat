@@ -27,8 +27,10 @@ func RestApiExample() {
 	router.HandleFunc("/items/{id}", updateItem).Methods("PUT")
 	router.HandleFunc("/items/{id}", deleteItem).Methods("DELETE")
 
+	router.HandleFunc("/users", handleGetAllUsers).Methods("GET")
 	router.HandleFunc("/users", handleCreateUser).Methods("POST")
 	router.HandleFunc("/users/{id}", handleUpdateUser).Methods("PUT")
+	router.HandleFunc("/users/{id}", handleGetUser).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
@@ -55,11 +57,11 @@ func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 
-	id,err := strconv.Atoi(params["id"]) 
+	id, err := strconv.Atoi(params["id"])
 
-  if err !=nil {
-    log.Fatal(err)
-  }
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var updateUserEntity userUseCase.UpdateUserEntity
 	var updateUserInterface userUseCase.UpdateUserInterface
@@ -73,6 +75,32 @@ func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	updateUserInterface = &userUseCase.UpdateUser{}
 	updateUserInterface.Controller(&updateUserEntity, w, id)
+
+}
+
+func handleGetUser(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var getUserInterface userUseCase.GetUserInterface
+
+	getUserInterface = &userUseCase.GetUser{}
+	getUserInterface.GetSingleController(id, w)
+
+}
+
+func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
+
+	var getUserInterface userUseCase.GetUserInterface
+
+	getUserInterface = &userUseCase.GetUser{}
+	getUserInterface.GetAllController(w)
 
 }
 
