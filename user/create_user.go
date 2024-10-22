@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"io"
+  "net/http"
 	shared "kslabs/chat-app-cli/shared"
 	"log"
 )
@@ -17,15 +17,15 @@ type CreateUserEntity struct {
 }
 
 type CreateUserInterface interface {
-	Controller(u *CreateUserEntity, w io.Writer)
+	Controller(u *CreateUserEntity, w http.ResponseWriter)
 }
 
 type CreateUser struct {
 	db     *sql.DB
-	writer *io.Writer
+	writer *http.ResponseWriter
 }
 
-func (user *CreateUser) SetWriter(write io.Writer) {
+func (user *CreateUser) SetWriter(write http.ResponseWriter) {
 	user.writer = &write
 }
 
@@ -34,7 +34,7 @@ func (user *CreateUser) Presentation(u *CreateUserEntity) {
 	json.NewEncoder(*user.writer).Encode(&u)
 }
 
-func (user *CreateUser) Controller(u *CreateUserEntity, w io.Writer) {
+func (user *CreateUser) Controller(u *CreateUserEntity, w http.ResponseWriter) {
 	user.SetWriter(w)
 	user.DataAccess(u)
 	user.Presentation(u)

@@ -5,25 +5,25 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"io"
+	"net/http"
 	shared "kslabs/chat-app-cli/shared"
 	"log"
 )
 
 type DeleteUserInterface interface {
-	Controller(id int, w io.Writer)
+	Controller(id int, w http.ResponseWriter)
 }
 
 type DeleteUser struct {
 	db     *sql.DB
-	writer *io.Writer
+	writer *http.ResponseWriter
 }
 
-func (user *DeleteUser) SetWriter(w *io.Writer) {
+func (user *DeleteUser) SetWriter(w *http.ResponseWriter) {
 	user.writer = w
 }
 
-func (user *DeleteUser) Controller(id int, w io.Writer) {
+func (user *DeleteUser) Controller(id int, w http.ResponseWriter) {
 	user.SetWriter(&w)
 	user.DataAccess(id)
 	user.Presentation()
