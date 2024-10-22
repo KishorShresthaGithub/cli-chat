@@ -31,6 +31,7 @@ func RestApiExample() {
 	router.HandleFunc("/users", handleCreateUser).Methods("POST")
 	router.HandleFunc("/users/{id}", handleUpdateUser).Methods("PUT")
 	router.HandleFunc("/users/{id}", handleGetUser).Methods("GET")
+	router.HandleFunc("/users/{id}", handleDeleteUser).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
@@ -102,6 +103,18 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 	getUserInterface = &userUseCase.GetUser{}
 	getUserInterface.GetAllController(w)
 
+}
+
+func handleDeleteUser(w http.ResponseWriter, r *http.Request){
+  
+  params:= mux.Vars(r)
+
+  id,_:= strconv.Atoi(params["id"])
+
+
+  var deleteUserInterface userUseCase.DeleteUserInterface
+  deleteUserInterface = &userUseCase.DeleteUser{}
+  deleteUserInterface.Controller(id, w)
 }
 
 func getItems(w http.ResponseWriter, r *http.Request) {

@@ -4,10 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
-	"io"
 	shared "kslabs/chat-app-cli/shared"
 	"log"
-  "fmt"
+  "net/http"
 )
 
 type GetUserEntity struct {
@@ -23,44 +22,51 @@ type GetUserDb struct {
 }
 
 type GetUserInterface interface {
-	GetAllController(w io.Writer)
-	GetSingleController(id int, w io.Writer)
+	GetAllController(w http.ResponseWriter)
+	GetSingleController(id int, w http.ResponseWriter)
 }
 
 type GetUser struct {
 	db     *sql.DB
-	writer *io.Writer
+	writer *http.ResponseWriter
 }
 
-func (user *GetUser) SetWriter(writer io.Writer) {
-	user.writer = &writer
+func (user *GetUser) SetWriter(writer *http.ResponseWriter) {
+	user.writer = writer
 }
 
-func (user *GetUser) GetSingleController(id int, writer io.Writer) {
-	u := user.DataAccessSingle(id)
-	user.SinglePresentation(u, &writer)
+func (user *GetUser) GetSingleController(id int, writer http.ResponseWriter) {
+  user.SetWriter(&writer)
+	u,err := user.DataAccessSingle(id)
+
+  if err !=nil{
+    http.Error(writer, "some error happened", http.StatusInternalServerError)   
+    return
+  }
+
+	user.SinglePresentation(u)
 }
 
-func (user *GetUser) SinglePresentation(u *GetUserEntity, writer *io.Writer) {
-	json.NewEncoder(*writer).Encode(u)
+func (user *GetUser) SinglePresentation(u *GetUserEntity) {
+	json.NewEncoder(*user.writer).Encode(u)
 }
 
-func (user *GetUser) Presentation(u []*GetUserEntity, writer *io.Writer) {
-	json.NewEncoder(*writer).Encode(u)
+func (user *GetUser) Presentation(u []*GetUserEntity) {
+	json.NewEncoder(*user.writer).Encode(u)
 }
 
-func (user *GetUser) GetAllController(w io.Writer) {
+func (user *GetUser) GetAllController(w http.ResponseWriter) {
+	user.SetWriter(&w)
 	u := user.DataAccess()
-  fmt.Println(u)
-	user.Presentation(u, &w)
+	user.Presentation(u)
 }
 
-func (user *GetUser) DataAccessSingle(id int) *GetUserEntity {
+func (user *GetUser) DataAccessSingle(id int) (*GetUserEntity, any) {
 	user.db = shared.GetDbConnection()
 
 	defer user.db.Close()
 
-	stmt, err := user.db.Prepare("SELECT * FROM users WHERE id=?")
+	stmt, err := user.db.Prepare("SELECT id, name, email FROM users WHERE id=?")
 
 	if err != nil {
 		log.Fatal(err)
@@ -71,14 +77,14 @@ func (user *GetUser) DataAccessSingle(id int) *GetUserEntity {
 	err = stmt.QueryRow(id).Scan(&userFromDb.id, &userFromDb.name, &userFromDb.email)
 
 	if err != nil {
-		log.Fatal(err)
+    return nil, err
 	}
 
 	return &GetUserEntity{
 		ID:    userFromDb.id,
 		Name:  userFromDb.name,
 		Email: userFromDb.email,
-	}
+	},nil
 
 }
 
@@ -111,5 +117,5 @@ func (user *GetUser) DataAccess() []*GetUserEntity {
 		})
 	}
 
-	return collect 
+	return collect
 }
